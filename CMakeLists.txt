@@ -28,6 +28,7 @@ add_executable(ThisGame
     src/Mesh.cpp
     src/Vector.cpp
     src/Camera.cpp
+    src/Object.cpp
     
     imgui/imgui.cpp
     imgui/imgui_draw.cpp
