@@ -306,6 +306,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
+    if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS)
+    {
+        mainCam.speed = 4;
+    }
+    if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE)
+    {
+        mainCam.speed = 2;
+    }
 }
 
 void glfwInputPolling(GLFWwindow* window)
