@@ -13,8 +13,33 @@ class VBO
 
         void bind();
         void unBind();
-    private:
 
+        VBO &operator=(VBO&& other)
+        {
+            if(this == &other) return *this;
+
+            this->id = other.id;
+            this->vSize = other.vSize;
+            other.id = 0;
+            other.vSize = 0;
+    
+
+            return *this;
+        }
+
+        VBO(const VBO&) = delete;
+
+        VBO(VBO &&other) noexcept : id(other.id), vSize(other.vSize)
+        {
+            other.id = 0;
+            other.vSize = 0;
+        }
+
+        VBO& operator=(const VBO&) = delete;
+
+        GLsizeiptr getVsize() {return vSize;}
+    private:
+        GLsizeiptr vSize = 0;
 
 
 };

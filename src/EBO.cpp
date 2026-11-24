@@ -15,6 +15,7 @@ void EBO::setData(const GLuint *indices, GLsizeiptr size)
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
+    iSize = size;
     unBind();
 }
 
