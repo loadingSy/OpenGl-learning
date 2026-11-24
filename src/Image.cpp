@@ -26,8 +26,8 @@ Image::Image(std::string imgPath, int setColorChannels)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgBuffer);
-    glBindBuffer(GL_TEXTURE_2D, 0);
-    glGenerateMipmap(id);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     if(imgBuffer)
     {
@@ -48,5 +48,5 @@ void Image::bind(GLuint slot)
 
 void Image::unBind()
 {
-    glBindTexture(id, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
