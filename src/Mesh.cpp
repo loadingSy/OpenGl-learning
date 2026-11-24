@@ -49,6 +49,7 @@ void Mesh::assignShader(std::string vShader, std::string fShader)
 }
 void Mesh::assignIndices(const GLuint *Indices, GLsizeiptr size)
 {
+    iSize = size;
     vao.bind();
     ebo.setData(Indices, size);
     ebo.bind();
@@ -59,6 +60,7 @@ void Mesh::assignIndices(const GLuint *Indices, GLsizeiptr size)
 }
 void Mesh::assignVertices(const GLfloat* vertices, GLsizeiptr size)
 {
+    vSize = size;
     vao.bind();
     vbo.setData(vertices, size);
     vbo.bind();
@@ -73,4 +75,13 @@ void Mesh::linkAttribute(GLuint layout, GLint numComponents, GLenum type, GLsize
 GLuint Mesh::getUniformLocation(std::string name)
 {
     return glGetUniformLocation(shaderId, name.c_str());
+}
+
+GLsizeiptr Mesh::getVsize()
+{
+    return vSize;
+}
+GLsizeiptr Mesh::getIsize()
+{
+    return iSize;
 }
