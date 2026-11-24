@@ -28,6 +28,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 #include "Object.hpp"
+#define DEBUG_UNIFORM_LOGS
 
 
 
@@ -191,12 +192,11 @@ int main()
     bool renderBox = true;
 
     //Setting Up Starting Uniforms
-    glUseProgram(box1.mesh.shaderId);
-    glUniform1i(img1Uniform, 0);
-    glUniform1f(scaleUniform, scale);
-    glUseProgram(box2.mesh.shaderId);
-    glUniform1i(img1Uniform2, 1);
-    glUniform1f(scaleUniform2, scale);
+    box1.setUniform("imgId", 0, true);
+    box1.setUniform("scale", scale);
+    box1.mesh.getShader()->unUse();
+    box2.setUniform("imgId", 0, true);
+    box2.setUniform("scale", scale);
 
     box1.setUniform("n", 1);
 
@@ -242,29 +242,27 @@ int main()
         projection = glm::perspective(glm::radians(45.0f), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
         //Rendering
-        img1.bind(0);
-        glUseProgram(box1.mesh.shaderId);
-        
         if(renderBox)
         {
+            img1.bind(0);
+            glUseProgram(box1.mesh.shaderId);
             glBindVertexArray(box1.mesh.vaoId);
-            glUniformMatrix4fv(viewUniform, 1, GL_FALSE, glm::value_ptr(mainCam.getMatrix()));
-            glUniformMatrix4fv(modelUniform, 1, GL_FALSE, glm::value_ptr(model));
-            glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, glm::value_ptr(projection));
-            glUniform1f(scaleUniform, scale);
+            box1.setUniform("view", mainCam.getMatrix());
+            box1.setUniform("model", model);
+            box1.setUniform("projection", projection);
+            box1.setUniform("scale", scale);
             box1.render();
+
+            img2.bind(1);
+            glUseProgram(box2.mesh.shaderId);
+            glBindVertexArray(box2.mesh.vaoId);
+            box2.setUniform("view", mainCam.getMatrix());
+            box2.setUniform("model", model2);
+            box2.setUniform("projection", projection);
+            box2.setUniform("scale", scale);
+            box2.render();
         }
             
-        
-        img2.bind(1);
-        glUseProgram(box2.mesh.shaderId);
-        glBindVertexArray(box2.mesh.vaoId);
-        glUniformMatrix4fv(viewUniform2, 1, GL_FALSE, glm::value_ptr(mainCam.getMatrix()));
-        glUniformMatrix4fv(modelUniform2, 1, GL_FALSE, glm::value_ptr(model2));
-        glUniformMatrix4fv(projectionUniform2, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniform1f(scaleUniform2, scale);
-        if(renderBox)
-            box2.render();
 
         //Imgui Ui
         std::string fpsCounter = "Fps: " + std::to_string(1/deltaTime);

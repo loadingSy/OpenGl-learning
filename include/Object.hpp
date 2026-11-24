@@ -42,7 +42,7 @@ class Object
         GLuint getUniformLocation(const char *name, const bool cache = true);
         
         template <typename T>
-        void setUniform(const char *name, T value);
+        void setUniform(const char *name, T value, bool useShader = false);
 
         /*todo: add getModelMatrix implementation
         make uniforms cache

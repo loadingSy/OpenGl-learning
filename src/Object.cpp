@@ -1,10 +1,14 @@
 #include "Object.hpp"
-#include <cstddef>
-#include <iostream>
+
 #include <iterator>
 #include <map>
 #include <string>
 
+// #define DEBUG_UNIFORM_LOGS
+
+#ifdef DEBUG_UNIFORM_LOGS 
+#include <iostream>
+#endif
 
 void Object::changePos(const glm::vec3 movementVector)
 {
@@ -50,19 +54,40 @@ GLuint Object::getUniformLocation(const char *name,const bool cache)
 
 
 template<>
-void Object::setUniform(const char *name, float value)
+void Object::setUniform(const char *name, float value, bool useShader)
 {
+    if(useShader)
+        mesh.getShader()->use();
 
+    #ifdef DEBUG_UNIFORM_LOGS
+    std::cout << "\nfloat, genius right?..  " << value << '\n';
+    #endif
+
+    glUniform1f(getUniformLocation(name), value);
 }
 template<>
-void Object::setUniform(const char *name, int value)
+void Object::setUniform(const char *name, int value, bool useShader)
 {
-    std::cout << "int, genius right?";
+    if(useShader)
+        mesh.getShader()->use();
+
+    #ifdef DEBUG_UNIFORM_LOGS
+    std::cout << "\nint, genius right?..  " << value << '\n';
+    #endif
+
+    glUniform1i(getUniformLocation(name), value);
 }
 template<>
-void Object::setUniform(const char *name, glm::mat4 value)
+void Object::setUniform(const char *name, glm::mat4 value, bool useShader)
 {
+    if(useShader)
+        mesh.getShader()->use();
 
+    #ifdef DEBUG_UNIFORM_LOGS    
+    std::cout << "\nmatrix, genius right?..  \n";
+    #endif
+
+    glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 
