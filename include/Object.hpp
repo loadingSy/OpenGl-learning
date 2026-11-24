@@ -15,10 +15,10 @@ class Object
         Mesh mesh;
 
         Object() : position(0), rotation(0) {};
-        Object(Mesh pMesh) : mesh(pMesh), position(0), rotation(0) {};
-        Object(Mesh pMesh, glm::vec3 pPosition) : mesh(pMesh), position(pPosition), rotation(0) {};
-        Object(Mesh pMesh, vector3 pPosition) : mesh(pMesh), position(pPosition), rotation(0) {};
-        Object(Mesh pMesh, glm::vec3 pPosition, vector2 pRotation) : mesh(pMesh), position(pPosition), rotation(pRotation) {};
+        Object(Mesh &&pMesh) : mesh(std::move(pMesh)), position(0), rotation(0) {};
+        Object(Mesh &&pMesh, glm::vec3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0) {};
+        Object(Mesh &&pMesh, vector3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0) {};
+        Object(Mesh &&pMesh, glm::vec3 pPosition, vector2 pRotation) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation) {};
         Object(glm::vec3 pPosition) : position(pPosition), rotation(0){};
         Object(vector3 pPosition) : position(pPosition), rotation(0){};
         Object(glm::vec3 pPosition, vector2 pRotation) : position(pPosition), rotation(pRotation){};

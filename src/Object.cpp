@@ -23,6 +23,6 @@ void Object::changeRotation(vector2 rotation)
 
 void Object::render()
 {
-    
+    glDrawElements(GL_TRIANGLES, mesh.getIsize()/sizeof(GLuint), GL_UNSIGNED_INT, 0);
 }
 
