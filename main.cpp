@@ -12,9 +12,11 @@
 #include <string>
 #include "imgui/imgui.h"
 #include "include/Camera.hpp"
+#include "include/EBO.hpp"
 #include "include/FilePaths.hpp"
 #include "include/FileReader.hpp"
 #include "include/Mesh.hpp"
+#include "include/Shader.hpp"
 #include "include/Vector.hpp"
 #include "stb/stb_image.h"
 #include "include/Image.hpp"
@@ -143,9 +145,23 @@ int main()
     img2.bind(1);
 
 
-    //shader creation
-    Object box1O(Mesh(vertices, sizeof(vertices), indices, sizeof(indices), getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")));
-    Object box2O(Mesh(vertices, sizeof(vertices), indices, sizeof(indices), getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")));
+
+    Object box1O(
+        Mesh(
+            Shader(getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")),
+            VAO(),
+            VBO(vertices, sizeof(vertices)),
+            EBO(indices, sizeof(indices))
+        )
+    );
+    
+    Object box2O(
+        Mesh(
+            vertices, sizeof(vertices), indices, sizeof(indices),
+            getProjectPath("assets/defaultVertex.glsl"),
+            getProjectPath("assets/defaultFragment.glsl")
+        )
+    );
 
     box2O.mesh.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
     box2O.mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
@@ -215,6 +231,7 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::Begin("Debug");
         
         model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1,0,0));
         model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0,1,0));
@@ -276,6 +293,7 @@ int main()
         const char* fpsCounterC_str = fpsCounter.c_str();
         ImGui::Text("%s", fpsCounterC_str);
 
+        ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
