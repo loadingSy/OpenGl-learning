@@ -21,6 +21,20 @@ Mesh::Mesh(const GLfloat* vertices, GLsizeiptr verticesSize, const GLuint *Indic
     assignIndices(Indices, size);
     assignVertices(vertices, verticesSize);
 }
+Mesh::Mesh(Shader &&pShader, VAO &&pVao, VBO &&pVbo, EBO &&pEbo) : vSize(0), iSize(0), shader(std::move(pShader)), vao(std::move(pVao)), vbo(std::move(pVbo)), ebo(std::move(pEbo))
+{
+    iSize = ebo.getIsize();
+    vSize = vbo.getVsize();
+    shaderId = shader.id;
+    vaoId = vao.id;
+    vboId = vbo.id;
+    eboId = ebo.id;
+
+    vao.bind();
+    ebo.bind();
+    vao.unBind();
+}
+
 Mesh::Mesh()
 {
     vaoId = vao.id;

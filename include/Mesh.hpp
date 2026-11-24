@@ -23,7 +23,10 @@ class Mesh
         Mesh(const GLfloat* vertices, GLsizeiptr verticesSize, const GLuint *Indices, GLsizeiptr size, std::string vShader, std::string fShader);
         Mesh(std::string vShader, std::string fShader);
         Mesh(const GLfloat* vertices, GLsizeiptr verticesSize, const GLuint *Indices, GLsizeiptr size);
+        Mesh(Shader &&pShader, VAO &&pVao, VBO &&pVbo, EBO &&pEbo);
         Mesh();
+
+
         Mesh(Mesh&& other) noexcept : shaderId(other.shaderId), vaoId(other.vaoId), vboId(other.vboId), eboId(other.eboId), shader(std::move(other.shader)), vao(std::move(other.vao)), vbo(std::move(other.vbo)), ebo(std::move(other.ebo)), vSize(other.vSize), iSize(other.iSize)
         {
             other.shaderId = 0;
@@ -48,16 +51,9 @@ class Mesh
         {
             if (this == &v) return *this;
 
-            this->ebo = v.ebo;
             this->eboId = v.eboId;
-
-            this->shader = v.shader;
             this->shaderId = v.shaderId;
-
-            this->vbo = v.vbo;
             this->vboId = v.vboId;
-
-            this->vao = v.vao;
             this->vaoId = v.vaoId;
 
             this->vSize = v.vSize;
