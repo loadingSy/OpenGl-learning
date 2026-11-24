@@ -82,8 +82,6 @@ class Mesh
         Mesh& operator=(const Mesh&) = delete;
         
 
-        GLuint getUniformLocation(std::string name);
-
     GLsizeiptr getVsize();
     GLsizeiptr getIsize();
     Shader *getShader();

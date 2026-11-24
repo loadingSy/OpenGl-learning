@@ -16,6 +16,8 @@ class Shader
         void unUse();
         void destroy();
 
+        GLuint getUniformLocation(const char* name);
+
         Shader &operator=(Shader&& other)
         {
             if(this == &other) return *this;
