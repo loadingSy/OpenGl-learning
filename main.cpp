@@ -85,16 +85,42 @@ int main()
     ImGui_ImplOpenGL3_Init();
 
     
-    //Boxes Vertices
     float vertices[] = {
-        -1.000000 -1.000000 1.000000 
-    };  -1.000000 1.000000 1.000000  
-        -1.000000 -1.000000 -1.000000
-    GLui-1.000000 1.000000 -1.000000 nt indices[] = {
-        1.000000 -1.000000 1.000000  0,  1,  2,   0,  2,  3,
-        1.000000 1.000000 1.000000   4,  5,  6,   4,  6,  7,
-        1.000000 -1.000000 -1.000000 8,  9, 10,   8, 10, 11,
-        1.000000 1.000000 -1.000000  12, 13, 14,  12, 14, 15,
+        -1.0f, -1.0f,  1.0f,  1.0f, 0.2f, 0.2f,  0.0f, 0.0f,
+        1.0f, -1.0f,  1.0f,  1.0f, 0.6f, 0.1f,  1.0f, 0.0f,
+        1.0f,  1.0f,  1.0f,  1.0f, 0.9f, 0.2f,  1.0f, 1.0f,
+        -1.0f,  1.0f,  1.0f,  0.9f, 0.3f, 1.0f,  0.0f, 1.0f,
+
+        1.0f, -1.0f, -1.0f,  0.1f, 0.8f, 0.8f,  0.0f, 0.0f,
+        -1.0f, -1.0f, -1.0f,  0.1f, 0.4f, 0.9f,  1.0f, 0.0f,
+        -1.0f,  1.0f, -1.0f,  0.3f, 0.2f, 0.9f,  1.0f, 1.0f,
+        1.0f,  1.0f, -1.0f,  0.2f, 0.9f, 1.0f,  0.0f, 1.0f,
+
+        -1.0f, -1.0f, -1.0f,  0.2f, 0.9f, 0.3f,  0.0f, 0.0f,
+        -1.0f, -1.0f,  1.0f,  0.6f, 1.0f, 0.2f,  1.0f, 0.0f,
+        -1.0f,  1.0f,  1.0f,  0.1f, 0.7f, 0.6f,  1.0f, 1.0f,
+        -1.0f,  1.0f, -1.0f,  0.0f, 1.0f, 0.8f,  0.0f, 1.0f,
+
+        1.0f, -1.0f,  1.0f,  0.9f, 0.2f, 0.7f,  0.0f, 0.0f,
+        1.0f, -1.0f, -1.0f,  0.6f, 0.1f, 0.9f,  1.0f, 0.0f,
+        1.0f,  1.0f, -1.0f,  0.9f, 0.4f, 0.9f,  1.0f, 1.0f,
+        1.0f,  1.0f,  1.0f,  1.0f, 1.0f, 0.3f,  0.0f, 1.0f,
+
+        -1.0f,  1.0f,  1.0f,  0.3f, 0.7f, 1.0f,  0.0f, 0.0f,
+        1.0f,  1.0f,  1.0f,  1.0f, 0.9f, 1.0f,  1.0f, 0.0f,
+        1.0f,  1.0f, -1.0f,  0.8f, 0.6f, 1.0f,  1.0f, 1.0f,
+        -1.0f,  1.0f, -1.0f,  0.6f, 0.4f, 1.0f,  0.0f, 1.0f,
+
+        -1.0f, -1.0f, -1.0f,  0.9f, 0.7f, 0.2f,  0.0f, 0.0f,
+        1.0f, -1.0f, -1.0f,  0.8f, 0.4f, 0.1f,  1.0f, 0.0f,
+        1.0f, -1.0f,  1.0f,  0.7f, 0.9f, 0.3f,  1.0f, 1.0f,
+        -1.0f, -1.0f,  1.0f,  1.0f, 0.8f, 0.2f,  0.0f, 1.0f
+    };
+    GLuint indices[] = {
+        0,  1,  2,   0,  2,  3,
+        4,  5,  6,   4,  6,  7,
+        8,  9, 10,   8, 10, 11,
+        12, 13, 14,  12, 14, 15,
         16, 17, 18,  16, 18, 19,
         20, 21, 22,  20, 22, 23
     };
@@ -138,27 +164,25 @@ int main()
 
     //Uniforms Location Storing
     glUseProgram(box1.mesh.shaderId);
-    GLint scaleUniform = box1.mesh.getUniformLocation("scale");
-    GLint img1Uniform = box1.mesh.getUniformLocation("ourTexture");
-    GLint modelUniform = box1.mesh.getUniformLocation("model");
-    GLint viewUniform = box1.mesh.getUniformLocation("view");
-    GLint projectionUniform =  box1.mesh.getUniformLocation("projection");
+    GLint scaleUniform = box1.getUniformLocation("scale");
+    GLint img1Uniform = box1.getUniformLocation("ourTexture");
+    GLint modelUniform = box1.getUniformLocation("model");
+    GLint viewUniform = box1.getUniformLocation("view");
+    GLint projectionUniform =  box1.getUniformLocation("projection");
     glUseProgram(box2.mesh.shaderId);
-    GLint scaleUniform2 = box2.mesh.getUniformLocation("scale");
-    GLint img1Uniform2 = box2.mesh.getUniformLocation("ourTexture");
-    GLint modelUniform2 = box2.mesh.getUniformLocation("model");
-    GLint viewUniform2 = box2.mesh.getUniformLocation("view");
-    GLint projectionUniform2 =  box2.mesh.getUniformLocation("projection");
-
-
+    GLint scaleUniform2 = box2.getUniformLocation("scale");
+    GLint img1Uniform2 = box2.getUniformLocation("ourTexture");
+    GLint modelUniform2 = box2.getUniformLocation("model");
+    GLint viewUniform2 = box2.getUniformLocation("view");
+    GLint projectionUniform2 =  box2.getUniformLocation("projection");
 
     //View Setup
     glm::mat4 model(1.0f);
-    glm::mat4 model2(glm::translate(glm::mat4(1.0f), glm::vec3(1,1,0)));
+    glm::mat4 model2(glm::translate(glm::mat4(1.0f), glm::vec3(2,2,0)));
     glm::mat4 projection(1.0f);
 
     mainCam.updateCameraVectors();
-    mainCam.changePos(vector3(0,0,-3));
+    mainCam.changePos(vector3(0,0,-6));
 
     projection = glm::perspective(glm::radians(45.0f), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
@@ -173,6 +197,8 @@ int main()
     glUseProgram(box2.mesh.shaderId);
     glUniform1i(img1Uniform2, 1);
     glUniform1f(scaleUniform2, scale);
+
+    box1.setUniform("n", 1);
 
     GLfloat lastTime = 0;
     GLfloat deltaTime = 0;
@@ -218,13 +244,17 @@ int main()
         //Rendering
         img1.bind(0);
         glUseProgram(box1.mesh.shaderId);
-        glBindVertexArray(box1.mesh.vaoId);
-        glUniformMatrix4fv(viewUniform, 1, GL_FALSE, glm::value_ptr(mainCam.getMatrix()));
-        glUniformMatrix4fv(modelUniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniform1f(scaleUniform, scale);
+        
         if(renderBox)
+        {
+            glBindVertexArray(box1.mesh.vaoId);
+            glUniformMatrix4fv(viewUniform, 1, GL_FALSE, glm::value_ptr(mainCam.getMatrix()));
+            glUniformMatrix4fv(modelUniform, 1, GL_FALSE, glm::value_ptr(model));
+            glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, glm::value_ptr(projection));
+            glUniform1f(scaleUniform, scale);
             box1.render();
+        }
+            
         
         img2.bind(1);
         glUseProgram(box2.mesh.shaderId);

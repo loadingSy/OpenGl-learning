@@ -86,10 +86,6 @@ void Mesh::linkAttribute(GLuint layout, GLint numComponents, GLenum type, GLsize
 {
     vao.linkAttribute(vbo, layout, numComponents, type, stride, offset);
 }
-GLuint Mesh::getUniformLocation(std::string name)
-{
-    return glGetUniformLocation(shaderId, name.c_str());
-}
 
 GLsizeiptr Mesh::getVsize()
 {

@@ -15,7 +15,7 @@ class Camera
         float yaw = -90, pitch = 0;
 
         float speed = 2;
-        vector2 sensitivity = vector2(0.4f, 0.4f);
+        vector2 sensitivity = vector2(0.3f, 0.2f);
 
         Camera() : position(glm::vec3(0)), forward(0,0,-1), right(1,0,0), up(0,1,0) {}
         Camera(const vector2 pSensitivity) : sensitivity(pSensitivity){};
