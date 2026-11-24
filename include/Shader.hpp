@@ -16,6 +16,25 @@ class Shader
         void unUse();
         void destroy();
 
+        Shader &operator=(Shader&& other)
+        {
+            if(this == &other) return *this;
+
+            this->id = other.id;
+            other.id = 0;
+
+            return *this;
+        }
+
+        Shader(const Shader&) = delete;
+
+        Shader(Shader &&other) noexcept : id(other.id)
+        {
+            other.id = 0;
+        }
+
+        Shader& operator=(const Shader&) = delete;
+
     private:
 
 
