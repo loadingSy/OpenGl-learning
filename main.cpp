@@ -23,7 +23,7 @@
 #include "Vector.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
-
+#include "Object.hpp"
 
 
 
@@ -142,33 +142,35 @@ int main()
     Image img2(getProjectPath("assets/textures/basboos.jpg"), 4);
     img2.bind(1);
 
-    //shader creation
-    Mesh box(vertices, sizeof(vertices), indices, sizeof(indices), getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl"));
-    box.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-    box.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
-    box.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
 
-    Mesh box2(vertices, sizeof(vertices), indices, sizeof(indices), getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl"));
-    box2.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-    box2.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
-    box2.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
+    //shader creation
+    Object box1O(Mesh(vertices, sizeof(vertices), indices, sizeof(indices), getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")));
+    Object box2O(Mesh(vertices, sizeof(vertices), indices, sizeof(indices), getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")));
+
+    box2O.mesh.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+    box2O.mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
+    box2O.mesh.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
+
+    box1O.mesh.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+    box1O.mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
+    box1O.mesh.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
 
 
     glClearColor(0.1,0.1,0.1, 0);
 
-    glUseProgram(box.shaderId);
-    GLint scaleUniform = box.getUniformLocation("scale");
-    GLint img1Uniform = box.getUniformLocation("ourTexture");
-    GLint modelUniform = box.getUniformLocation("model");
-    GLint viewUniform = box.getUniformLocation("view");
-    GLint projectionUniform =  box.getUniformLocation("projection");
+    glUseProgram(box1O.mesh.shaderId);
+    GLint scaleUniform = box1O.mesh.getUniformLocation("scale");
+    GLint img1Uniform = box1O.mesh.getUniformLocation("ourTexture");
+    GLint modelUniform = box1O.mesh.getUniformLocation("model");
+    GLint viewUniform = box1O.mesh.getUniformLocation("view");
+    GLint projectionUniform =  box1O.mesh.getUniformLocation("projection");
 
-    glUseProgram(box2.shaderId);
-    GLint scaleUniform2 = box2.getUniformLocation("scale");
-    GLint img1Uniform2 = box2.getUniformLocation("ourTexture");
-    GLint modelUniform2 = box2.getUniformLocation("model");
-    GLint viewUniform2 = box2.getUniformLocation("view");
-    GLint projectionUniform2 =  box2.getUniformLocation("projection");
+    glUseProgram(box2O.mesh.shaderId);
+    GLint scaleUniform2 = box2O.mesh.getUniformLocation("scale");
+    GLint img1Uniform2 = box2O.mesh.getUniformLocation("ourTexture");
+    GLint modelUniform2 = box2O.mesh.getUniformLocation("model");
+    GLint viewUniform2 = box2O.mesh.getUniformLocation("view");
+    GLint projectionUniform2 =  box2O.mesh.getUniformLocation("projection");
 
 
     glm::mat4 model(1.0f);
@@ -186,11 +188,11 @@ int main()
 
     projection = glm::perspective(glm::radians(45.0f), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
-    glUseProgram(box.shaderId);
+    glUseProgram(box1O.mesh.shaderId);
     glUniform1i(img1Uniform, 0);
     glUniform1f(scaleUniform, scale);
 
-    glUseProgram(box2.shaderId);
+    glUseProgram(box2O.mesh.shaderId);
     glUniform1i(img1Uniform2, 1);
     glUniform1f(scaleUniform2, scale);
 
@@ -229,30 +231,34 @@ int main()
         projection = glm::perspective(glm::radians(45.0f), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
         img1.bind(0);
-        glUseProgram(box.shaderId);
-        glBindVertexArray(box.vaoId);
-        // glBindBuffer(GL_INDEX_ARRAY, box.eboId);
+        glUseProgram(box1O.mesh.shaderId);
+        glBindVertexArray(box1O.mesh.vaoId);
+        // glBindBuffer(GL_INDEX_ARRAY, box1O.mesh.eboId);
         glUniformMatrix4fv(viewUniform, 1, GL_FALSE, glm::value_ptr(mainCam.getMatrix()));
         glUniformMatrix4fv(modelUniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, glm::value_ptr(projection));
         glUniform1f(scaleUniform, scale);
 
+    
+        box1O.render();
         
 
-        if(renderBox)
-            glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(GLuint), GL_UNSIGNED_INT, 0);
+        // if(renderBox)
+        //     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(GLuint), GL_UNSIGNED_INT, 0);
         
         img2.bind(1);
-        glUseProgram(box2.shaderId);
-        glBindVertexArray(box2.vaoId);
-        // glBindBuffer(GL_INDEX_ARRAY, box.eboId);
+        glUseProgram(box2O.mesh.shaderId);
+        glBindVertexArray(box2O.mesh.vaoId);
+        // glBindBuffer(GL_INDEX_ARRAY, box1O.mesh.eboId);
         glUniformMatrix4fv(viewUniform2, 1, GL_FALSE, glm::value_ptr(mainCam.getMatrix()));
         glUniformMatrix4fv(modelUniform2, 1, GL_FALSE, glm::value_ptr(model2));
         glUniformMatrix4fv(projectionUniform2, 1, GL_FALSE, glm::value_ptr(projection));
         glUniform1f(scaleUniform2, scale);
-        if(renderBox)
-            glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(GLuint), GL_UNSIGNED_INT, 0);
+        // if(renderBox)
+        //     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(GLuint), GL_UNSIGNED_INT, 0);
         
+        box2O.render();
+
         //imgui debugging
         ImGui::Text("Object");
         ImGui::Checkbox("Render Box", &renderBox);
