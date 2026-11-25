@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <iostream>
 #include <math.h>
+#include <minwindef.h>
 #include <string.h>
 #include <string>
 #include "imgui/imgui.h"
@@ -32,6 +33,16 @@
 
 
 
+bool smoothFov = false;
+float sprintFovMultiplier = 1.3f;
+float targetFov = 45.0f;
+
+
+template <typename T>
+void lerpValue(T &current, T target, T a)
+{
+    current = current + (target - current) * a;
+}
 
 int mainWinWidth = 0;
 int mainWinHeight = 0;
@@ -263,6 +274,14 @@ int main()
         //Camera 
         mainCam.rotate(mouseInput.x, mouseInput.y);
         mainCam.move(inputVector*deltaTime);
+        
+        if(smoothFov)
+        {
+            lerpValue(fov, targetFov, 0.05f);
+            if(fov == targetFov)
+                smoothFov = false;
+        }
+
         projection = glm::perspective(glm::radians(fov), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
         
@@ -357,11 +376,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS)
     {
-        mainCam.speed = 4;
+        mainCam.speed = 10;
+        smoothFov = true;
+        targetFov *= sprintFovMultiplier;
     }
     if(key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE)
     {
-        mainCam.speed = 2;
+        mainCam.speed = 4;
+        smoothFov = true;
+        targetFov /= sprintFovMultiplier;
     }
 }
 
