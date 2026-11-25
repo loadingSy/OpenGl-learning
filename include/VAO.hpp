@@ -9,8 +9,9 @@ class VAO
         GLuint id;
         VAO();
         ~VAO();
-        void bind();
-        void unBind();
+        const void bind();
+        const void unBind();
+        const void destroy() {glDeleteVertexArrays(1, &id); id = 0;}
 
         void linkAttribute(VBO &vbo, GLuint layout, GLint numComponents, GLenum type, GLsizei stride, const void* offset);
 
@@ -19,6 +20,8 @@ class VAO
         {
             if(this == &other) return *this;
 
+            if(id != 0)
+                destroy();
             this->id = other.id;
             other.id = 0;
 

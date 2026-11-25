@@ -12,16 +12,18 @@ class Shader
         Shader(std::string vertexShaderFile, std::string fragmentShaderFile);
         Shader();
         ~Shader();
-        void use();
-        void unUse();
+        const void use();
+        const void unUse();
         void destroy();
-
         GLuint getUniformLocation(const char* name);
 
         Shader &operator=(Shader&& other)
         {
             if(this == &other) return *this;
 
+
+            if(id != 0)
+                destroy();
             this->id = other.id;
             other.id = 0;
 

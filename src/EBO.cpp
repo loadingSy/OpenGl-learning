@@ -19,12 +19,12 @@ void EBO::setData(const GLuint *indices, GLsizeiptr size)
     unBind();
 }
 
-void EBO::bind()
+const void EBO::bind()
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
 }
 
-void EBO::unBind()
+const void EBO::unBind()
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
