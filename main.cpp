@@ -137,8 +137,48 @@ int main()
         20, 21, 22,  20, 22, 23
     };
 
+float skyBoxVertices[] = {
+     1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.6666666666f,
+    -1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 1.000000f,
+    -1.0f,  1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 1.000000f,
+     1.0f,  1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 0.6666666666f,
 
-    Object boxObjects[3] = 
+     1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 0.3333333333f,
+     1.0f,  1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 0.6666666666f,
+    -1.0f,  1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.00f, 0.6666666666f,
+    -1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.00f, 0.3333333333f,
+
+    -1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  1.00f, 0.3333333333f,
+    -1.0f,  1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  1.00f, 0.6666666666f,
+    -1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.75f, 0.6666666666f,
+    -1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.75f, 0.3333333333f,
+
+    -1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.0000000000f,
+     1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.3333333333f,
+     1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 0.3333333333f,
+    -1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 0.0000000000f,
+
+     1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.3333333333f,
+     1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.6666666666f,
+     1.0f,  1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 0.6666666666f,
+     1.0f, -1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  0.25f, 0.3333333333f,
+
+    -1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.75f, 0.3333333333f,
+    -1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.75f, 0.6666666666f,
+     1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.6666666666f,
+     1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.3333333333f
+};
+
+GLuint skyBoxIndices[] = {
+     0,  1,  2,   0,  2,  3,
+     4,  5,  6,   4,  6,  7,
+     8,  9, 10,   8, 10, 11,
+    12, 13, 14,  12, 14, 15,
+    16, 17, 18,  16, 18, 19,
+    20, 21, 22,  20, 22, 23
+};
+
+    Object boxObjects[4] = 
     {
         Object(
         Mesh(
@@ -167,19 +207,31 @@ int main()
             VBO(vertices, sizeof(vertices)),
             EBO(indices, sizeof(indices))
             )
-        )
+        ),
+        Object(
+        Mesh(
+            Shader(getProjectPath("assets/defaultVertex.glsl"),
+            getProjectPath("assets/defaultFragment.glsl")),
+            VAO(),
+            VBO(skyBoxVertices, sizeof(skyBoxVertices)),
+            EBO(skyBoxIndices, sizeof(skyBoxIndices))
+            )
+        ),
     };
     
-    float *boxesRotationFloats[3][3];
-    float *boxesPositionFloats[3][3];
-    float *boxesScalesFloats[3][3];
+    float *boxesRotationFloats[4][3];
+    float *boxesPositionFloats[4][3];
+    float *boxesScalesFloats[4][3];
+    std::string imguiBoxesHeaderNames[4];
 
-    Image boxesImages[3] = 
+    Image boxesImages[4] = 
     {
         Image(getProjectPath("assets/textures/toms.jpg"), 4),
         Image(getProjectPath("assets/textures/basboos.jpg"), 4),
-        Image(getProjectPath("assets/textures/qalbi.jpg"), 4)
+        Image(getProjectPath("assets/textures/qalbi.jpg"), 4),
+        Image(getProjectPath("assets/textures/skyBox.png"), 4, GL_NEAREST)
     };
+
 
     for(int i = 0; i < std::size(boxObjects); i++)
     {
@@ -228,9 +280,6 @@ int main()
     glClearColor(0.1,0.1,0.1, 0);
 
 
-
-    std::string imguiBoxesHeaderNames[3];
-
     for(int i = 0; i < std::size(boxObjects); i++)
         {
             const char *boxNamePrefix = "Box ";
@@ -238,6 +287,9 @@ int main()
         }
 
 
+        *boxesScalesFloats[3][0] = 200;
+        *boxesScalesFloats[3][1] = 200;
+        *boxesScalesFloats[3][2] = 200;
     
     while (!glfwWindowShouldClose(mainWin)) 
     {

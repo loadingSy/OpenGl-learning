@@ -17,9 +17,11 @@ class Image
     public:
         GLuint id;
         unsigned char *imgBuffer;
-        Image(std::string imgPath, int setColorChannels);
+        Image(std::string imgPath, int setColorChannels, GLint filter = GL_LINEAR);
         ~Image();
 
+        void generateImage(int setColorChannels, GLint imgFilter);
+        void generateImage(std::string imgPath, int setColorChannels, GLint imgFilter);
         void bind(GLuint slot);
         void unBind();
 

@@ -6,10 +6,19 @@
 
 
 
-Image::Image(std::string imgPath, int setColorChannels)
+Image::Image(std::string imgPath, int setColorChannels, GLint filter)
 : imgPath(imgPath.c_str())
 {
+    generateImage(setColorChannels, filter);
+}
+void Image::generateImage(int setColorChannels, GLint imgFilter)
+{
+    generateImage(imgPath, setColorChannels, imgFilter);
+}
 
+void Image::generateImage(std::string imgPath, int setColorChannels, GLint imgFilter)
+{
+    imgPath = imgPath.c_str();
     stbi_set_flip_vertically_on_load(1);
     imgBuffer = stbi_load(this->imgPath, &width, &height, &colorChannels, setColorChannels);
     if(imgBuffer == NULL)
@@ -20,8 +29,8 @@ Image::Image(std::string imgPath, int setColorChannels)
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, imgFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, imgFilter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
