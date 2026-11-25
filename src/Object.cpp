@@ -25,6 +25,8 @@ void Object::changeRotation(const float yawRotation, const float pitchRotation, 
 {
     rotation.x += yawRotation;
     rotation.y += pitchRotation;
+    rotation.z += rollRotation;
+
 }
 
 void Object::changeRotation(const vector3 rotation)

@@ -17,7 +17,7 @@ std::string getExeDirectory() {
 
 std::string getProjectPath(const std::string& relativePath) {
     #ifdef NDEBUG
-        return getExeDirectory() + relativePath;
+        return getExeDirectory() + '/' relativePath;
     #else
         return std::string(PROJECT_SOURCE_DIR) + '/' + relativePath;
     #endif

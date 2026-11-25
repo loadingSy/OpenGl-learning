@@ -127,78 +127,121 @@ int main()
     };
 
 
-    //Img Setup
-    Image img1(getProjectPath("assets/textures/toms.jpg"), 4);
-    img1.bind(0);
-
-    Image img2(getProjectPath("assets/textures/basboos.jpg"), 4);
-    img2.bind(1);
-
-    //Models Creation
-    Object box1(
+    Object boxObjects[3] = 
+    {
+        Object(
         Mesh(
             Shader(getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")),
             VAO(),
             VBO(vertices, sizeof(vertices)),
             EBO(indices, sizeof(indices))
-        )
-    );
-    
-    Object box2(
+            )
+        ),
+
+        Object(
         Mesh(
             Shader(getProjectPath("assets/defaultVertex.glsl"),
             getProjectPath("assets/defaultFragment.glsl")),
             VAO(),
             VBO(vertices, sizeof(vertices)),
             EBO(indices, sizeof(indices))
+            )
+        ),
+
+        Object(
+        Mesh(
+            Shader(getProjectPath("assets/defaultVertex.glsl"),
+            getProjectPath("assets/defaultFragment.glsl")),
+            VAO(),
+            VBO(vertices, sizeof(vertices)),
+            EBO(indices, sizeof(indices))
+            )
         )
-    );
+    };
+    
+    float *boxesRotationFloats[3][3];
+    float *boxesPositionFloats[3][3];
+    float boxesScales[3] = {1, 1, 1};
 
-    //Vao Linking
-    box2.mesh.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-    box2.mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
-    box2.mesh.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
-    box1.mesh.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-    box1.mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
-    box1.mesh.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
+    Image boxesImages[3] = 
+    {
+        Image(getProjectPath("assets/textures/toms.jpg"), 4),
+        Image(getProjectPath("assets/textures/basboos.jpg"), 4),
+        Image(getProjectPath("assets/textures/qalbi.jpg"), 4)
+    };
 
+    for(int i = 0; i < std::size(boxObjects); i++)
+    {
+        Object *box = &boxObjects[i];
+        box->mesh.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+        box->mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
+        box->mesh.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
+        
+        boxesPositionFloats[i][0] = &box->position.x;
+        boxesPositionFloats[i][1] = &box->position.y;
+        boxesPositionFloats[i][2] = &box->position.z;
+
+        boxesRotationFloats[i][0] = &box->rotation.x;
+        boxesRotationFloats[i][1] = &box->rotation.y;
+        boxesRotationFloats[i][2] = &box->rotation.z;
+
+        boxObjects[i].setUniform("imgId", 0, true);
+        boxObjects[i].setUniform("scale", boxesScales[0]);
+        boxObjects[i].mesh.getShader()->unUse();
+
+        boxesImages[i].bind(GL_TEXTURE0 + i);
+
+        boxObjects[i].changePos(vector3(0, i*2, 0));
+
+    }
     //View Setup
-    glm::mat4 model(1.0f);
-    glm::mat4 model2(glm::translate(glm::mat4(1.0f), glm::vec3(2,2,0)));
     glm::mat4 projection(1.0f);
+    float fov = 45.0f;
 
     mainCam.updateCameraVectors();
-    mainCam.changePos(vector3(0,0,-6));
+    mainCam.changePos(vector3(-6,0,0));
+    mainCam.changeRotation(90,0);
 
     projection = glm::perspective(glm::radians(45.0f), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
 
     bool renderBox = true;
-    float boxesScales[2] = {1, 1};
-    float* box1Rotation[3] = {&box1.rotation.x, &box1.rotation.y, &box1.rotation.z};
-    float* box2Rotation[3] = {&box2.rotation.x, &box2.rotation.y, &box2.rotation.z};
-    float* box1Position[3] = {&box1.position.x, &box1.position.y, &box1.position.z};
-    float* box2Position[3] = {&box2.position.x, &box2.position.y, &box2.position.z};
-
-    //Setting Up Starting Uniforms
-    box1.setUniform("imgId", 0, true);
-    box1.setUniform("scale", boxesScales[0]);
-    box1.mesh.getShader()->unUse();
-    box2.setUniform("imgId", 0, true);
-    box2.setUniform("scale", boxesScales[1]);
-
-    GLfloat lastTime = 0;
-    GLfloat deltaTime = 0;
+    
+    GLdouble lastTime = 0;
+    GLdouble deltaTime = glfwGetTime();
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1,0.1,0.1, 0);
 
-    box2.position += vector3(0,2,0);
+
+
+    std::string imguiBoxesHeaderNames[3];
+
+    for(int i = 0; i < std::size(boxObjects); i++)
+        {
+            const char *boxNamePrefix = "Box ";
+            imguiBoxesHeaderNames[i] = std::string(boxNamePrefix) + std::to_string(i+1);
+        }
+
+
+    
     while (!glfwWindowShouldClose(mainWin)) 
     {
         //DT calculation
-        deltaTime = glfwGetTime() - lastTime;
-        lastTime = glfwGetTime();
+        bool newSecond = false;
+        static int lastSecond = glfwGetTime();
+        
+
+        if(lastSecond != static_cast<int>(glfwGetTime()))
+        {
+            newSecond = true;
+            lastSecond = static_cast<int>(glfwGetTime());
+        }
+
+        double time = glfwGetTime();
+        deltaTime = time - lastTime;
+        
+        lastTime = time;
 
         //Open gl
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -212,49 +255,50 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
-        ImGui::Begin("Debug");
+        ImGui::Begin("Editor");
 
         //Camera 
         mainCam.rotate(mouseInput.x, mouseInput.y);
         mainCam.move(inputVector*deltaTime);
-        projection = glm::perspective(glm::radians(45.0f), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
+        projection = glm::perspective(glm::radians(fov), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
-        //Rendering
-        if(renderBox)
-        {
-            img1.bind(0);
-            glUseProgram(box1.mesh.shaderId);
-            glBindVertexArray(box1.mesh.vaoId);
-            // box1.setUniform("model", model);
-            box1.setUniform("scale", boxesScales[0]);
-            box1.render(mainCam.getMatrix(), projection);
-
-            img2.bind(1);
-            glUseProgram(box2.mesh.shaderId);
-            glBindVertexArray(box2.mesh.vaoId);
-            // box2.setUniform("model", model2);
-            box2.setUniform("scale", boxesScales[1]);
-            box2.render(mainCam.getMatrix(), projection);
-        }
+        
             
 
         //Imgui Ui
-        std::string fpsCounter = "Fps: " + std::to_string(1/deltaTime);
-        const char* fpsCounterC_str = fpsCounter.c_str();
+        static std::string fpsCounter = "Fps: " + std::to_string(1/deltaTime);
+        static const char* fpsCounterC_str = fpsCounter.c_str();
 
+        if(newSecond)
+        {
+            fpsCounter = "Fps: " + std::to_string(1/deltaTime);
+            fpsCounterC_str = fpsCounter.c_str();
+        }
 
-        if (ImGui::CollapsingHeader("Box 1")) 
+        for(int i = 0; i < std::size(boxObjects); i++)
         {
-            ImGui::SliderFloat3("Position##1", *box1Position, -5, 5);
-            ImGui::SliderFloat3("Rotation##1", *box1Rotation, -360, 360);
-            ImGui::SliderFloat("Scale##1", &boxesScales[0], 0.1, 4);
+            //Rendering
+            if(renderBox)
+            {
+                boxesImages[i].bind(i);
+                glUseProgram(boxObjects[i].mesh.shaderId);
+                glBindVertexArray(boxObjects[i].mesh.vaoId);
+                boxObjects[i].setUniform("scale", boxesScales[i]);
+                boxObjects[i].setUniform("textureId", i);
+                boxObjects[i].render(mainCam.getMatrix(), projection);
+            }
+
+            ImGui::PushID(i); 
+            if (ImGui::CollapsingHeader(imguiBoxesHeaderNames[i].c_str()))
+            {
+                ImGui::SliderFloat3("Position", *boxesPositionFloats[i], -5, 5);
+                ImGui::SliderFloat3("Rotation", *boxesRotationFloats[i], -360, 360);
+                ImGui::SliderFloat("Scale", &boxesScales[i], 0.1, 4);
+            } 
+
+            ImGui::PopID();
         }
-        if (ImGui::CollapsingHeader("Box 2")) 
-        {
-            ImGui::SliderFloat3("Position##2", *box2Position, -5, 5);
-            ImGui::SliderFloat3("Rotation##2", *box2Rotation, -360, 360);
-            ImGui::SliderFloat("Scale##2", &boxesScales[1], 0.1, 4);
-        }
+
         ImGui::Checkbox("Render Box", &renderBox);
         ImGui::Separator();
         if (ImGui::CollapsingHeader("Camera")) 
@@ -262,6 +306,7 @@ int main()
             ImGui::Text("Camera");
             ImGui::SliderFloat("X Sensitivity", &mainCam.sensitivity.x, 0.01f, 1.0f);
             ImGui::SliderFloat("Y Sensitivity", &mainCam.sensitivity.y, 0.01f, 1.0f);
+            ImGui::SliderFloat("Fov", &fov, 5, 120);
             ImGui::Separator();
             ImGui::Text("%s", fpsCounterC_str);
         }
