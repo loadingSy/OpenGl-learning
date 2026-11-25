@@ -3,6 +3,8 @@
 #include <iterator>
 #include <map>
 #include <string>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 // #define DEBUG_UNIFORM_LOGS
 
@@ -19,13 +21,13 @@ void Object::changePos(const vector3 movementVector)
     position += movementVector;
 }
 
-void Object::changeRotation(const float yawRotation, const float pitchRotation)
+void Object::changeRotation(const float yawRotation, const float pitchRotation, const float rollRotation)
 {
     rotation.x += yawRotation;
     rotation.y += pitchRotation;
 }
 
-void Object::changeRotation(const vector2 rotation)
+void Object::changeRotation(const vector3 rotation)
 {
     this->rotation += rotation;
 }
@@ -88,8 +90,8 @@ void Object::setUniform(const char *name, glm::mat4 value, bool useShader)
 
 glm::mat4 Object::getModelMatrix()
 {
-    glm::mat4 matrix(0.0f);
-    matrix[3] = glm::vec4(position.x, position.y, position.z, 1);
+    glm::mat4 matrix = glm::translate(glm::mat4(1.0f), position);
+    matrix *= glm::yawPitchRoll(glm::radians(rotation.y), glm::radians(rotation.x), glm::radians(rotation.z));
     return matrix;
 }
 
@@ -99,6 +101,8 @@ void Object::render( glm::mat4 view,  glm::mat4 projection)
     projection = glm::mat4(projection);
     setUniform("view", view, true);
     setUniform("projection", projection);
+    setUniform("model", getModelMatrix());
     glDrawElements(GL_TRIANGLES, mesh.getIsize()/sizeof(GLuint), GL_UNSIGNED_INT, 0);
     
 }
+

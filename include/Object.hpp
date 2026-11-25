@@ -11,7 +11,7 @@ class Object
 {
     public:
         glm::vec3 position;
-        vector2 rotation;
+        vector3 rotation;
 
         Mesh mesh;
 
@@ -19,12 +19,15 @@ class Object
         Object(Mesh &&pMesh) : mesh(std::move(pMesh)), position(0), rotation(0) {};
         Object(Mesh &&pMesh, glm::vec3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0) {};
         Object(Mesh &&pMesh, vector3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0) {};
-        Object(Mesh &&pMesh, glm::vec3 pPosition, vector2 pRotation) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation) {};
+        Object(Mesh &&pMesh, glm::vec3 pPosition, vector3 pRotation) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation) {};
         Object(glm::vec3 pPosition) : position(pPosition), rotation(0){};
         Object(vector3 pPosition) : position(pPosition), rotation(0){};
-        Object(glm::vec3 pPosition, vector2 pRotation) : position(pPosition), rotation(pRotation){};
-        Object(vector3 pPosition, vector2 pRotation) : position(pPosition), rotation(pRotation){};
-
+        Object(glm::vec3 pPosition, vector3 pRotation) : position(pPosition), rotation(pRotation){};
+        Object(vector3 pPosition, vector3 pRotation) : position(pPosition), rotation(pRotation){};
+        
+        Object(Object &&other) noexcept : mesh(std::move(other.mesh)), position(other.position),rotation(other.rotation) {}
+        Object(const Object&) = delete;
+        
         void render(glm::mat4 view,  glm::mat4 projection);
 
         /*Pure Transformation with no Speed, Great for setting Positions*/
@@ -32,10 +35,10 @@ class Object
         /*Pure Transformation with no Speed, Great for setting Positions*/
         void changePos(const vector3 movementVector);
 
-        /*Pure rotation with N angles yaw, pitch*/
-        void changeRotation(const float yawRotation, const float pitchRotation);
-        /*Pure rotation with N angles yaw, pitch*/
-        void changeRotation(const vector2 rotation);
+        /*Pure rotation with N angles yaw, pitch, roll*/
+        void changeRotation(const float yawRotation, const float pitchRotation, const float rollRotation);
+        /*Pure rotation with N angles yaw, pitch, roll*/
+        void changeRotation(const vector3 rotation);
 
         glm::mat4 getModelMatrix();
 
