@@ -25,7 +25,7 @@ class Object
         Object(glm::vec3 pPosition, vector2 pRotation) : position(pPosition), rotation(pRotation){};
         Object(vector3 pPosition, vector2 pRotation) : position(pPosition), rotation(pRotation){};
 
-        void render();
+        void render(glm::mat4 view,  glm::mat4 projection);
 
         /*Pure Transformation with no Speed, Great for setting Positions*/
         void changePos(const glm::vec3 movementVector);
@@ -37,7 +37,7 @@ class Object
         /*Pure rotation with N angles yaw, pitch*/
         void changeRotation(const vector2 rotation);
 
-        glm::vec4 getModelMatrix();
+        glm::mat4 getModelMatrix();
 
         GLuint getUniformLocation(const char *name, const bool cache = true);
         

@@ -163,20 +163,6 @@ int main()
     box1.mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
     box1.mesh.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
 
-    //Uniforms Location Storing
-    glUseProgram(box1.mesh.shaderId);
-    GLint scaleUniform = box1.getUniformLocation("scale");
-    GLint img1Uniform = box1.getUniformLocation("ourTexture");
-    GLint modelUniform = box1.getUniformLocation("model");
-    GLint viewUniform = box1.getUniformLocation("view");
-    GLint projectionUniform =  box1.getUniformLocation("projection");
-    glUseProgram(box2.mesh.shaderId);
-    GLint scaleUniform2 = box2.getUniformLocation("scale");
-    GLint img1Uniform2 = box2.getUniformLocation("ourTexture");
-    GLint modelUniform2 = box2.getUniformLocation("model");
-    GLint viewUniform2 = box2.getUniformLocation("view");
-    GLint projectionUniform2 =  box2.getUniformLocation("projection");
-
     //View Setup
     glm::mat4 model(1.0f);
     glm::mat4 model2(glm::translate(glm::mat4(1.0f), glm::vec3(2,2,0)));
@@ -197,8 +183,6 @@ int main()
     box1.mesh.getShader()->unUse();
     box2.setUniform("imgId", 0, true);
     box2.setUniform("scale", scale);
-
-    box1.setUniform("n", 1);
 
     GLfloat lastTime = 0;
     GLfloat deltaTime = 0;
@@ -251,7 +235,7 @@ int main()
             box1.setUniform("model", model);
             box1.setUniform("projection", projection);
             box1.setUniform("scale", scale);
-            box1.render();
+            box1.render(mainCam.getMatrix(), projection);
 
             img2.bind(1);
             glUseProgram(box2.mesh.shaderId);
@@ -260,7 +244,7 @@ int main()
             box2.setUniform("model", model2);
             box2.setUniform("projection", projection);
             box2.setUniform("scale", scale);
-            box2.render();
+            box2.render(mainCam.getMatrix(), projection);
         }
             
 
