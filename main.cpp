@@ -134,7 +134,6 @@ int main()
     Image img2(getProjectPath("assets/textures/basboos.jpg"), 4);
     img2.bind(1);
 
-
     //Models Creation
     Object box1(
         Mesh(
@@ -173,16 +172,20 @@ int main()
 
     projection = glm::perspective(glm::radians(45.0f), (float)mainWinWidth/mainWinHeight, 0.01f, 10000.0f);
 
-    float rotation[3] = {0.0f,0.0f,0.0f};
-    float scale = 1;
+
     bool renderBox = true;
+    float boxesScales[2] = {1, 1};
+    float* box1Rotation[3] = {&box1.rotation.x, &box1.rotation.y, &box1.rotation.z};
+    float* box2Rotation[3] = {&box2.rotation.x, &box2.rotation.y, &box2.rotation.z};
+    float* box1Position[3] = {&box1.position.x, &box1.position.y, &box1.position.z};
+    float* box2Position[3] = {&box2.position.x, &box2.position.y, &box2.position.z};
 
     //Setting Up Starting Uniforms
     box1.setUniform("imgId", 0, true);
-    box1.setUniform("scale", scale);
+    box1.setUniform("scale", boxesScales[0]);
     box1.mesh.getShader()->unUse();
     box2.setUniform("imgId", 0, true);
-    box2.setUniform("scale", scale);
+    box2.setUniform("scale", boxesScales[1]);
 
     GLfloat lastTime = 0;
     GLfloat deltaTime = 0;
@@ -190,6 +193,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1,0.1,0.1, 0);
 
+    box2.position += vector3(0,2,0);
     while (!glfwWindowShouldClose(mainWin)) 
     {
         //DT calculation
@@ -209,16 +213,6 @@ int main()
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::Begin("Debug");
-        
-        //Models
-        model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1,0,0));
-        model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0,1,0));
-        model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0,0,1));
-        
-        model2 = glm::rotate(model2, glm::radians(-rotation[0]), glm::vec3(1,0,0));
-        model2 = glm::rotate(model2, glm::radians(-rotation[1]), glm::vec3(0,1,0));
-        model2 = glm::rotate(model2, glm::radians(-rotation[2]), glm::vec3(0,0,1));
-        
 
         //Camera 
         mainCam.rotate(mouseInput.x, mouseInput.y);
@@ -231,19 +225,15 @@ int main()
             img1.bind(0);
             glUseProgram(box1.mesh.shaderId);
             glBindVertexArray(box1.mesh.vaoId);
-            box1.setUniform("view", mainCam.getMatrix());
-            box1.setUniform("model", model);
-            box1.setUniform("projection", projection);
-            box1.setUniform("scale", scale);
+            // box1.setUniform("model", model);
+            box1.setUniform("scale", boxesScales[0]);
             box1.render(mainCam.getMatrix(), projection);
 
             img2.bind(1);
             glUseProgram(box2.mesh.shaderId);
             glBindVertexArray(box2.mesh.vaoId);
-            box2.setUniform("view", mainCam.getMatrix());
-            box2.setUniform("model", model2);
-            box2.setUniform("projection", projection);
-            box2.setUniform("scale", scale);
+            // box2.setUniform("model", model2);
+            box2.setUniform("scale", boxesScales[1]);
             box2.render(mainCam.getMatrix(), projection);
         }
             
@@ -252,16 +242,32 @@ int main()
         std::string fpsCounter = "Fps: " + std::to_string(1/deltaTime);
         const char* fpsCounterC_str = fpsCounter.c_str();
 
-        ImGui::Text("Object");
+
+        if (ImGui::CollapsingHeader("Box 1")) 
+        {
+            ImGui::SliderFloat3("Position##1", *box1Position, -5, 5);
+            ImGui::SliderFloat3("Rotation##1", *box1Rotation, -360, 360);
+            ImGui::SliderFloat("Scale##1", &boxesScales[0], 0.1, 4);
+        }
+        if (ImGui::CollapsingHeader("Box 2")) 
+        {
+            ImGui::SliderFloat3("Position##2", *box2Position, -5, 5);
+            ImGui::SliderFloat3("Rotation##2", *box2Rotation, -360, 360);
+            ImGui::SliderFloat("Scale##2", &boxesScales[1], 0.1, 4);
+        }
         ImGui::Checkbox("Render Box", &renderBox);
-        ImGui::SliderFloat3("rotation", rotation, -3, 3);
-        ImGui::SliderFloat("Scale", &scale, 0.1, 4);
         ImGui::Separator();
-        ImGui::Text("Camera");
-        ImGui::SliderFloat("X Sensitivity", &mainCam.sensitivity.x, 0.01f, 1.0f);
-        ImGui::SliderFloat("Y Sensitivity", &mainCam.sensitivity.y, 0.01f, 1.0f);
-        ImGui::Separator();
-        ImGui::Text("%s", fpsCounterC_str);
+        if (ImGui::CollapsingHeader("Camera")) 
+        {
+            ImGui::Text("Camera");
+            ImGui::SliderFloat("X Sensitivity", &mainCam.sensitivity.x, 0.01f, 1.0f);
+            ImGui::SliderFloat("Y Sensitivity", &mainCam.sensitivity.y, 0.01f, 1.0f);
+            ImGui::Separator();
+            ImGui::Text("%s", fpsCounterC_str);
+        }
+        
+        
+        
         
         //Imgui End
         ImGui::End();
