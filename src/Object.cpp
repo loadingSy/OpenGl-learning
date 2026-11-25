@@ -88,6 +88,19 @@ void Object::setUniform(const char *name, glm::mat4 value, bool useShader)
     glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
+template<>
+void Object::setUniform(const char *name, glm::vec3 value, bool useShader)
+{
+    if(useShader)
+        mesh.getShader()->use();
+
+    #ifdef DEBUG_UNIFORM_LOGS    
+    std::cout << "\vec3, genius right?..  \n";
+    #endif
+
+    glUniform3fv(getUniformLocation(name), 1, glm::value_ptr(value));
+}
+
 
 glm::mat4 Object::getModelMatrix()
 {
