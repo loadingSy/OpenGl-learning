@@ -12,20 +12,24 @@ class Object
     public:
         glm::vec3 position;
         vector3 rotation;
+        vector3 scale;
 
         Mesh mesh;
 
-        Object() : position(0), rotation(0) {};
-        Object(Mesh &&pMesh) : mesh(std::move(pMesh)), position(0), rotation(0) {};
-        Object(Mesh &&pMesh, glm::vec3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0) {};
-        Object(Mesh &&pMesh, vector3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0) {};
-        Object(Mesh &&pMesh, glm::vec3 pPosition, vector3 pRotation) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation) {};
-        Object(glm::vec3 pPosition) : position(pPosition), rotation(0){};
-        Object(vector3 pPosition) : position(pPosition), rotation(0){};
-        Object(glm::vec3 pPosition, vector3 pRotation) : position(pPosition), rotation(pRotation){};
-        Object(vector3 pPosition, vector3 pRotation) : position(pPosition), rotation(pRotation){};
+        Object() : position(0), rotation(0), scale(1) {};
+        Object(Mesh &&pMesh) : mesh(std::move(pMesh)), position(0), rotation(0), scale(1) {};
+        Object(Mesh &&pMesh, glm::vec3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0), scale(1) {};
+        Object(Mesh &&pMesh, vector3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0), scale(1) {};
+        Object(Mesh &&pMesh, glm::vec3 pPosition, vector3 pRotation) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation), scale(1) {};
+        Object(Mesh &&pMesh, glm::vec3 pPosition, vector3 pRotation, vector3 pScale) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation), scale(pScale) {};
+        Object(glm::vec3 pPosition) : position(pPosition), rotation(0), scale(1){};
+        Object(vector3 pPosition) : position(pPosition), rotation(0), scale(1){};
+        Object(glm::vec3 pPosition, vector3 pRotation) : position(pPosition), rotation(pRotation), scale(1){};
+        Object(vector3 pPosition, vector3 pRotation) : position(pPosition), rotation(pRotation), scale(1){};
+        Object(glm::vec3 pPosition, vector3 pRotation, vector3 pScale) : position(pPosition), rotation(pRotation), scale(pScale){};
+        Object(vector3 pPosition, vector3 pRotation, vector3 pScale) : position(pPosition), rotation(pRotation), scale(pScale){};
         
-        Object(Object &&other) noexcept : mesh(std::move(other.mesh)), position(other.position),rotation(other.rotation) {}
+        Object(Object &&other) noexcept : mesh(std::move(other.mesh)), position(other.position),rotation(other.rotation), scale(other.scale) {}
         Object(const Object&) = delete;
         
         void render(glm::mat4 view,  glm::mat4 projection);

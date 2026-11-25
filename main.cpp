@@ -161,7 +161,7 @@ int main()
     
     float *boxesRotationFloats[3][3];
     float *boxesPositionFloats[3][3];
-    float boxesScales[3] = {1, 1, 1};
+    float *boxesScalesFloats[3][3];
 
     Image boxesImages[3] = 
     {
@@ -185,8 +185,11 @@ int main()
         boxesRotationFloats[i][1] = &box->rotation.y;
         boxesRotationFloats[i][2] = &box->rotation.z;
 
+        boxesScalesFloats[i][0] = &box->scale.x;
+        boxesScalesFloats[i][1] = &box->scale.y;
+        boxesScalesFloats[i][2] = &box->scale.z;
+
         boxObjects[i].setUniform("imgId", 0, true);
-        boxObjects[i].setUniform("scale", boxesScales[0]);
         boxObjects[i].mesh.getShader()->unUse();
 
         boxesImages[i].bind(GL_TEXTURE0 + i);
@@ -283,7 +286,6 @@ int main()
                 boxesImages[i].bind(i);
                 glUseProgram(boxObjects[i].mesh.shaderId);
                 glBindVertexArray(boxObjects[i].mesh.vaoId);
-                boxObjects[i].setUniform("scale", boxesScales[i]);
                 boxObjects[i].setUniform("textureId", i);
                 boxObjects[i].render(mainCam.getMatrix(), projection);
             }
@@ -293,7 +295,7 @@ int main()
             {
                 ImGui::SliderFloat3("Position", *boxesPositionFloats[i], -5, 5);
                 ImGui::SliderFloat3("Rotation", *boxesRotationFloats[i], -360, 360);
-                ImGui::SliderFloat("Scale", &boxesScales[i], 0.1, 4);
+                ImGui::SliderFloat3("Scale", *boxesScalesFloats[i], 0.1, 4);
             } 
 
             ImGui::PopID();

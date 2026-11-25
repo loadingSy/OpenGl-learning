@@ -26,7 +26,6 @@ void Object::changeRotation(const float yawRotation, const float pitchRotation, 
     rotation.x += yawRotation;
     rotation.y += pitchRotation;
     rotation.z += rollRotation;
-
 }
 
 void Object::changeRotation(const vector3 rotation)
@@ -93,7 +92,8 @@ void Object::setUniform(const char *name, glm::mat4 value, bool useShader)
 glm::mat4 Object::getModelMatrix()
 {
     glm::mat4 matrix = glm::translate(glm::mat4(1.0f), position);
-    matrix *= glm::yawPitchRoll(glm::radians(rotation.y), glm::radians(rotation.x), glm::radians(rotation.z));
+    matrix *= glm::yawPitchRoll(glm::radians(rotation.y), glm::radians(rotation.x), glm::radians(rotation.z));;
+    matrix *= glm::scale(glm::mat4(1), glm::vec3(scale));
     return matrix;
 }
 
