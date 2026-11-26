@@ -19,6 +19,12 @@ class VAO
         {
             if(this == &other) return *this;
 
+            if (id != 0)
+            {
+                glDeleteVertexArrays(1, &id);
+                id = 0;
+            }
+
             this->id = other.id;
             other.id = 0;
 

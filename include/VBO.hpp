@@ -18,6 +18,12 @@ class VBO
         {
             if(this == &other) return *this;
 
+            if (id != 0)
+            {
+                glDeleteBuffers(1, &id);
+                id = 0;
+            }
+
             this->id = other.id;
             this->vSize = other.vSize;
             other.id = 0;

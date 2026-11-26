@@ -22,6 +22,12 @@ class Shader
         {
             if(this == &other) return *this;
 
+            if(id != 0)
+            {
+                glDeleteProgram(id);
+                id = 0;
+            }
+
             this->id = other.id;
             other.id = 0;
 
