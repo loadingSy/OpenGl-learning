@@ -6,6 +6,7 @@
 #include <map>
 #include "Vector.hpp"
 #include "Mesh.hpp"
+#include <memory>
 
 
 class Object
@@ -15,14 +16,14 @@ class Object
         vector3 rotation;
         vector3 scale;
 
-        Mesh mesh;
+        std::shared_ptr<Mesh> mesh;
 
         Object() : position(0), rotation(0), scale(1) {};
-        Object(Mesh &&pMesh) : mesh(std::move(pMesh)), position(0), rotation(0), scale(1) {};
-        Object(Mesh &&pMesh, glm::vec3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0), scale(1) {};
-        Object(Mesh &&pMesh, vector3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0), scale(1) {};
-        Object(Mesh &&pMesh, glm::vec3 pPosition, vector3 pRotation) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation), scale(1) {};
-        Object(Mesh &&pMesh, glm::vec3 pPosition, vector3 pRotation, vector3 pScale) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation), scale(pScale) {};
+        Object(std::shared_ptr<Mesh>(pMesh)) : mesh(std::move(pMesh)), position(0), rotation(0), scale(1) {};
+        Object(std::shared_ptr<Mesh>(pMesh), glm::vec3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0), scale(1) {};
+        Object(std::shared_ptr<Mesh>(pMesh), vector3 pPosition) : mesh(std::move(pMesh)), position(pPosition), rotation(0), scale(1) {};
+        Object(std::shared_ptr<Mesh>(pMesh), glm::vec3 pPosition, vector3 pRotation) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation), scale(1) {};
+        Object(std::shared_ptr<Mesh>(pMesh), glm::vec3 pPosition, vector3 pRotation, vector3 pScale) : mesh(std::move(pMesh)), position(pPosition), rotation(pRotation), scale(pScale) {};
         Object(glm::vec3 pPosition) : position(pPosition), rotation(0), scale(1){};
         Object(vector3 pPosition) : position(pPosition), rotation(0), scale(1){};
         Object(glm::vec3 pPosition, vector3 pRotation) : position(pPosition), rotation(pRotation), scale(1){};

@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <iostream>
 #include <math.h>
+#include <memory>
 #include <minwindef.h>
 #include <string.h>
 #include <string>
@@ -97,7 +98,7 @@ int main()
     ImGui_ImplOpenGL3_Init();
 
     
-    float vertices[] = {
+    float normalBoxVertices[] = {
         -1.0f, -1.0f,  1.0f,  1.0f, 0.2f, 0.2f,  0.0f, 0.0f,
         1.0f, -1.0f,  1.0f,  1.0f, 0.6f, 0.1f,  1.0f, 0.0f,
         1.0f,  1.0f,  1.0f,  1.0f, 0.9f, 0.2f,  1.0f, 1.0f,
@@ -128,7 +129,7 @@ int main()
         1.0f, -1.0f,  1.0f,  0.7f, 0.9f, 0.3f,  1.0f, 1.0f,
         -1.0f, -1.0f,  1.0f,  1.0f, 0.8f, 0.2f,  0.0f, 1.0f
     };
-    GLuint indices[] = {
+    GLuint boxIndices[] = {
         0,  1,  2,   0,  2,  3,
         4,  5,  6,   4,  6,  7,
         8,  9, 10,   8, 10, 11,
@@ -169,54 +170,35 @@ float skyBoxVertices[] = {
      1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.3333333333f
 };
 
-GLuint skyBoxIndices[] = {
-     0,  1,  2,   0,  2,  3,
-     4,  5,  6,   4,  6,  7,
-     8,  9, 10,   8, 10, 11,
-    12, 13, 14,  12, 14, 15,
-    16, 17, 18,  16, 18, 19,
-    20, 21, 22,  20, 22, 23
-};
+
+std::shared_ptr<Mesh> boxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")),
+            VAO(),
+            VBO(normalBoxVertices, sizeof(normalBoxVertices)),
+            EBO(boxIndices, sizeof(boxIndices))
+        );
+
+std::shared_ptr<Mesh> skyBoxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")),
+            VAO(),
+            VBO(skyBoxVertices, sizeof(skyBoxVertices)),
+            EBO(boxIndices, sizeof(boxIndices))
+        );
 
     Object boxObjects[4] = 
     {
         Object(
-        Mesh(
-            Shader(getProjectPath("assets/defaultVertex.glsl"),getProjectPath("assets/defaultFragment.glsl")),
-            VAO(),
-            VBO(vertices, sizeof(vertices)),
-            EBO(indices, sizeof(indices))
-            )
+            boxPtr
         ),
 
         Object(
-        Mesh(
-            Shader(getProjectPath("assets/defaultVertex.glsl"),
-            getProjectPath("assets/defaultFragment.glsl")),
-            VAO(),
-            VBO(vertices, sizeof(vertices)),
-            EBO(indices, sizeof(indices))
-            )
+            boxPtr
         ),
 
         Object(
-        Mesh(
-            Shader(getProjectPath("assets/defaultVertex.glsl"),
-            getProjectPath("assets/defaultFragment.glsl")),
-            VAO(),
-            VBO(vertices, sizeof(vertices)),
-            EBO(indices, sizeof(indices))
-            )
+            boxPtr
         ),
         Object(
-        Mesh(
-            Shader(getProjectPath("assets/defaultVertex.glsl"),
-            getProjectPath("assets/defaultFragment.glsl")),
-            VAO(),
-            VBO(skyBoxVertices, sizeof(skyBoxVertices)),
-            EBO(skyBoxIndices, sizeof(skyBoxIndices))
-            )
-        ),
+            skyBoxPtr
+        )
     };
     
     float *boxesRotationFloats[4][3];
@@ -236,9 +218,9 @@ GLuint skyBoxIndices[] = {
     for(int i = 0; i < std::size(boxObjects); i++)
     {
         Object *box = &boxObjects[i];
-        box->mesh.linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-        box->mesh.linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
-        box->mesh.linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
+        box->mesh->linkAttribute(0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+        box->mesh->linkAttribute(1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3*sizeof(float)));
+        box->mesh->linkAttribute(2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6*sizeof(float)));
         
         boxesPositionFloats[i][0] = &box->position.x;
         boxesPositionFloats[i][1] = &box->position.y;
@@ -253,7 +235,7 @@ GLuint skyBoxIndices[] = {
         boxesScalesFloats[i][2] = &box->scale.z;
 
         boxObjects[i].setUniform("imgId", 0, true);
-        boxObjects[i].mesh.getShader()->unUse();
+        boxObjects[i].mesh->getShader()->unUse();
 
         boxesImages[i].bind(GL_TEXTURE0 + i);
 
@@ -355,8 +337,8 @@ GLuint skyBoxIndices[] = {
             if(renderBox)
             {
                 boxesImages[i].bind(i);
-                glUseProgram(boxObjects[i].mesh.shaderId);
-                glBindVertexArray(boxObjects[i].mesh.vaoId);
+                glUseProgram(boxObjects[i].mesh->shaderId);
+                glBindVertexArray(boxObjects[i].mesh->vaoId);
                 boxObjects[i].setUniform("textureId", i);
                 boxObjects[i].render(mainCam.getMatrix(), projection);
             }

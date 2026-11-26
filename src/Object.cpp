@@ -42,7 +42,7 @@ GLuint Object::getUniformLocation(const char *name,const bool cache)
     if(found)
         return uniformsLookup[name];
 
-    GLuint uId = mesh.getShader()->getUniformLocation(name);
+    GLuint uId = mesh->getShader()->getUniformLocation(name);
 
     if(cache)
         uniformsLookup[name] = uId;
@@ -55,7 +55,7 @@ template<>
 void Object::setUniform(const char *name, float value, bool useShader)
 {
     if(useShader)
-        mesh.getShader()->use();
+        mesh->getShader()->use();
 
     #ifdef DEBUG_UNIFORM_LOGS
     std::cout << "\nfloat, genius right?..  " << value << '\n';
@@ -67,7 +67,7 @@ template<>
 void Object::setUniform(const char *name, int value, bool useShader)
 {
     if(useShader)
-        mesh.getShader()->use();
+        mesh->getShader()->use();
 
     #ifdef DEBUG_UNIFORM_LOGS
     std::cout << "\nint, genius right?..  " << value << '\n';
@@ -79,7 +79,7 @@ template<>
 void Object::setUniform(const char *name, glm::mat4 value, bool useShader)
 {
     if(useShader)
-        mesh.getShader()->use();
+        mesh->getShader()->use();
 
     #ifdef DEBUG_UNIFORM_LOGS    
     std::cout << "\nmatrix, genius right?..  \n";
@@ -92,7 +92,7 @@ template<>
 void Object::setUniform(const char *name, glm::vec3 value, bool useShader)
 {
     if(useShader)
-        mesh.getShader()->use();
+        mesh->getShader()->use();
 
     #ifdef DEBUG_UNIFORM_LOGS    
     std::cout << "\vec3, genius right?..  \n";
@@ -117,7 +117,7 @@ void Object::render( glm::mat4 view,  glm::mat4 projection)
     setUniform("view", view, true);
     setUniform("projection", projection);
     setUniform("model", getModelMatrix());
-    glDrawElements(GL_TRIANGLES, mesh.getIsize()/sizeof(GLuint), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, mesh->getIsize()/sizeof(GLuint), GL_UNSIGNED_INT, 0);
     
 }
 
