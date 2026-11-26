@@ -11,16 +11,13 @@ class VBO
         void setData(const GLfloat *vertices, GLsizeiptr size);
         ~VBO();
 
-        const void bind();
-        const void unBind();
-        const void destroy() {glDeleteBuffers(1, &id); id = 0;}
+        void bind();
+        void unBind();
 
         VBO &operator=(VBO&& other)
         {
             if(this == &other) return *this;
 
-            if (id != 0)
-                destroy();
             this->id = other.id;
             this->vSize = other.vSize;
             other.id = 0;
@@ -34,8 +31,6 @@ class VBO
 
         VBO(VBO &&other) noexcept : id(other.id), vSize(other.vSize)
         {
-            if(id != 0)
-                destroy();
             other.id = 0;
             other.vSize = 0;
         }

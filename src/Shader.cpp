@@ -94,12 +94,12 @@ Shader::~Shader()
     glDeleteProgram(id);
 }
 
-const void Shader::use()
+void Shader::use()
 {
     glUseProgram(id);
 }
 
-const void Shader::unUse()
+void Shader::unUse()
 {
     glUseProgram(0);
 }

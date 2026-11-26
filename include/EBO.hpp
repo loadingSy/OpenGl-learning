@@ -9,9 +9,8 @@ class EBO
         EBO();
         ~EBO();
         void setData(const GLuint *indices, GLsizeiptr size);
-        const void bind();
-        const void unBind();
-        const void destroy() {glDeleteBuffers(1, &id); id = 0;}
+        void bind();
+        void unBind();
 
         //the move operator
         EBO &operator=(EBO &&other)
@@ -30,8 +29,6 @@ class EBO
         //move constructor (im still new to this but still learning new cpp concepts every day :)
         EBO(EBO&& other) noexcept : id(other.id), iSize(other.iSize) 
         {
-            if(id != 0)
-                destroy();
             other.id = 0;
             other.iSize = 0;
         }
