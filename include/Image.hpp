@@ -25,7 +25,7 @@ class Image
         void bind(GLuint slot);
         void unBind();
 
-        const char* imgPath;
+        std::string imgPath;
         GLint width, height, colorChannels;
     private:
 };

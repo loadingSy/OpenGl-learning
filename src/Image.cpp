@@ -8,7 +8,7 @@
 
 
 Image::Image(std::string imgPath, int setColorChannels, GLint filter)
-: imgPath(imgPath.c_str())
+: imgPath(imgPath)
 {
     if(!imgPath.empty())
         generateImage(setColorChannels, filter);
@@ -20,9 +20,8 @@ void Image::generateImage(int setColorChannels, GLint imgFilter)
 
 void Image::generateImage(std::string imgPath, int setColorChannels, GLint imgFilter)
 {
-    imgPath = imgPath.c_str();
     stbi_set_flip_vertically_on_load(1);
-    imgBuffer = stbi_load(this->imgPath, &width, &height, &colorChannels, setColorChannels);
+    imgBuffer = stbi_load(imgPath.c_str(), &width, &height, &colorChannels, setColorChannels);
     if(imgBuffer == NULL)
     {
         std::cerr << "Image failed to load: " << imgPath;
@@ -53,7 +52,7 @@ Image::~Image()
 
 void Image::bind(GLuint slot)
 {
-    if(imgPath[0] == '\0')
+    if(imgPath.empty())
         return;
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, id);
@@ -61,7 +60,7 @@ void Image::bind(GLuint slot)
 
 void Image::unBind()
 {
-    if(imgPath[0] == '\0')
+    if(imgPath.empty())
         return;
     glBindTexture(GL_TEXTURE_2D, 0);
 }
