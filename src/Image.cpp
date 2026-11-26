@@ -3,13 +3,15 @@
 #include "../stb/stb_image.h"
 #include <cstddef>
 #include <iostream>
+#include <string>
 
 
 
 Image::Image(std::string imgPath, int setColorChannels, GLint filter)
 : imgPath(imgPath.c_str())
 {
-    generateImage(setColorChannels, filter);
+    if(!imgPath.empty())
+        generateImage(setColorChannels, filter);
 }
 void Image::generateImage(int setColorChannels, GLint imgFilter)
 {
@@ -51,11 +53,15 @@ Image::~Image()
 
 void Image::bind(GLuint slot)
 {
+    if(imgPath[0] == '\0')
+        return;
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void Image::unBind()
 {
+    if(imgPath[0] == '\0')
+        return;
     glBindTexture(GL_TEXTURE_2D, 0);
 }
