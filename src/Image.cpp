@@ -18,6 +18,7 @@ void Image::generateImage(int setColorChannels, GLint imgFilter)
     generateImage(imgPath, setColorChannels, imgFilter);
 }
 
+
 void Image::generateImage(std::string imgPath, int setColorChannels, GLint imgFilter)
 {
     stbi_set_flip_vertically_on_load(1);
