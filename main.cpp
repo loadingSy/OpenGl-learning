@@ -14,10 +14,10 @@
 #include <string.h>
 #include <string>
 #include "imgui/imgui.h"
+#include "include/Box.hpp"
 #include "include/Camera.hpp"
 #include "include/EBO.hpp"
 #include "include/FilePaths.hpp"
-#include "include/FileReader.hpp"
 #include "include/Mesh.hpp"
 #include "include/Object.hpp"
 #include "include/Shader.hpp"
@@ -216,6 +216,50 @@ float lightSourceBoxVertices[] =
 
 };
 
+float boxWithNormal[] = {
+    0.0f,  0.0f, -1.0f,
+    0.0f,  0.0f, -1.0f, 
+    0.0f,  0.0f, -1.0f, 
+    0.0f,  0.0f, -1.0f, 
+    0.0f,  0.0f, -1.0f, 
+    0.0f,  0.0f, -1.0f, 
+
+    0.0f,  0.0f, 1.0f,
+    0.0f,  0.0f, 1.0f,
+    0.0f,  0.0f, 1.0f,
+    0.0f,  0.0f, 1.0f,
+    0.0f,  0.0f, 1.0f,
+    0.0f,  0.0f, 1.0f,
+
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+
+    1.0f,  0.0f,  0.0f,
+    1.0f,  0.0f,  0.0f,
+    1.0f,  0.0f,  0.0f,
+    1.0f,  0.0f,  0.0f,
+    1.0f,  0.0f,  0.0f,
+    1.0f,  0.0f,  0.0f,
+
+    0.0f, -1.0f,  0.0f,
+    0.0f, -1.0f,  0.0f,
+    0.0f, -1.0f,  0.0f,
+    0.0f, -1.0f,  0.0f,
+    0.0f, -1.0f,  0.0f,
+    0.0f, -1.0f,  0.0f,
+
+    0.0f,  1.0f,  0.0f,
+    0.0f,  1.0f,  0.0f,
+    0.0f,  1.0f,  0.0f,
+    0.0f,  1.0f,  0.0f,
+    0.0f,  1.0f,  0.0f,
+    0.0f,  1.0f,  0.0f
+};
+
 std::shared_ptr<Mesh> boxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/unlit/defaultFragment.glsl")),
             VAO(),
             VBO(normalBoxVertices, sizeof(normalBoxVertices)),
@@ -232,7 +276,13 @@ std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectP
             VBO(lightSourceBoxVertices, sizeof(lightSourceBoxVertices)),
             EBO(boxIndices, sizeof(boxIndices))
         );
-#define BOXESCOUNT 5
+std::shared_ptr<Mesh> litBoxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/lit/litFragment.glsl")),
+            VAO(),
+            VBO(normalBoxVertices, sizeof(normalBoxVertices)),
+            EBO(boxIndices, sizeof(boxIndices))
+        );
+
+#define BOXESCOUNT 6
     Box boxes[BOXESCOUNT] = 
     {
         Box(boxPtr, {3,3,2}, Image(getProjectPath("assets/textures/toms.jpg"), 4)),
@@ -240,13 +290,14 @@ std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectP
         Box(boxPtr, {3,3,2}, Image(getProjectPath("assets/textures/qalbi.jpg"), 4)),
         Box(skyBoxPtr, {3,3,2}, Image(getProjectPath("assets/textures/skyBox.png"), 4, GL_NEAREST)),
         Box(lightSourcePtr, {3, 3}),
+        Box(litBoxPtr, {3,3,2}, Image(getProjectPath("assets/textures/bigBasboos.jpg"), 4))
 
     };
-
-
-
-    
-
+    boxes[4].name = "Light Source";
+    boxes[5].name = "Lit box";
+    boxes[3].name = "Sky Box";
+    boxes[4].obj.changePos(vector3(-5.0f,2.0f, 0.0f));
+    boxes[5].isLit = true;
     std::string imguiBoxesHeaderNames[BOXESCOUNT];
 
     for(int i = 0; i < std::size(boxes); i++)
@@ -266,6 +317,8 @@ std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectP
         boxes[i].obj.changePos(vector3(0, i*2, 0));
 
     }
+
+    boxes[3].obj.scale = {200,200,200};
 
     //View Setup
     glm::mat4 projection(1.0f);
@@ -289,7 +342,7 @@ std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectP
 
     for(int i = 0; i < std::size(boxes); i++)
         {
-            const char *boxNamePrefix = "Box ";
+            const char *boxNamePrefix = boxes[i].name != "" ? boxes[i].name.c_str() : "Box ";
             imguiBoxesHeaderNames[i] = std::string(boxNamePrefix) + std::to_string(i+1);
         }
 
@@ -361,11 +414,10 @@ std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectP
                 boxes[i].image.bind(GL_TEXTURE0 + i);
                 glUseProgram(curBox->obj.mesh->shaderId);
                 glBindVertexArray(curBox->obj.mesh->vaoId);
-                curBox->obj.setUniform("hasImage", curBox->hasImage, true);
                 if(curBox->hasImage)
                     curBox->obj.setUniform("textureId", GL_TEXTURE0+i);
 
-                curBox->obj.render(mainCam.getMatrix(), projection);
+                curBox->render(mainCam.getMatrix(), projection);
             }
             ImGui::PushID(i); 
             if (ImGui::CollapsingHeader(imguiBoxesHeaderNames[i].c_str()))
