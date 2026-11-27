@@ -1,4 +1,3 @@
-#include "glm/glm/ext/vector_float3.hpp"
 #include "imgui.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "imgui/backends/imgui_impl_glfw.h"
@@ -34,6 +33,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 #include "Object.hpp"
+#include "Box.hpp"
 #define DEBUG_UNIFORM_LOGS
 
 
@@ -45,6 +45,7 @@
 template <typename T>
 void lerpValue(T &current, T target, T a);
 void linkFloatAttributes(std::shared_ptr<Mesh> mesh , std::initializer_list<int> attribs);
+void linkFloatAttributes(std::shared_ptr<Mesh> mesh , std::vector<int> attribs);
 Object createCubeObject(std::shared_ptr<Mesh> mesh, std::initializer_list<int> attribs);
 
 
@@ -181,111 +182,91 @@ float skyBoxVertices[] = {
 
 float lightSourceBoxVertices[] = 
 {
-    +1.0f,  1.0f, -1.0f,  
-    -1.0f,  1.0f, -1.0f,  
-    -1.0f,  1.0f,  1.0f,
+    +1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
+    -1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
+    -1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
 
-     +1.0f,  1.0f,  1.0f,
-    +1.0f, -1.0f,  1.0f,
-    +1.0f,  1.0f,  1.0f,
+     +1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f, -1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
 
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
 
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f,  1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
 
-    -1.0f, -1.0f, -1.0f,  
-    +1.0f, -1.0f, -1.0f, 
-    +1.0f, -1.0f,  1.0f, 
+    -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f, -1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
 
-    -1.0f, -1.0f,  1.0f, 
-    +1.0f, -1.0f, -1.0f, 
-    +1.0f,  1.0f, -1.0f, 
+    -1.0f, -1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f,  1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
 
-    +1.0f,  1.0f,  1.0f, 
-    +1.0f, -1.0f,  1.0f, 
-    -1.0f, -1.0f, -1.0f, 
+    +1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f, -1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
 
-    -1.0f,  1.0f, -1.0f, 
-    +1.0f,  1.0f, -1.0f, 
-    +1.0f, -1.0f, -1.0f, 
+    -1.0f,  1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f,  1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+    +1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
 
 };
 
-std::shared_ptr<Mesh> boxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/defaultVertex.glsl"),getProjectPath("assets/Shaders/defaultFragment.glsl")),
+std::shared_ptr<Mesh> boxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/unlit/defaultFragment.glsl")),
             VAO(),
             VBO(normalBoxVertices, sizeof(normalBoxVertices)),
             EBO(boxIndices, sizeof(boxIndices))
         );
 
-std::shared_ptr<Mesh> skyBoxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/defaultVertex.glsl"),getProjectPath("assets/Shaders/defaultFragment.glsl")),
+std::shared_ptr<Mesh> skyBoxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/unlit/defaultFragment.glsl")),
             VAO(),
             VBO(skyBoxVertices, sizeof(skyBoxVertices)),
             EBO(boxIndices, sizeof(boxIndices))
         );
-std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/lightingShaders/lightSourceVertexShader.glsl"),getProjectPath("assets/Shaders/lightingShaders/lightSourceFragmentShader.glsl")),
+std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/unlit/defaultFragment.glsl")),
             VAO(),
             VBO(lightSourceBoxVertices, sizeof(lightSourceBoxVertices)),
             EBO(boxIndices, sizeof(boxIndices))
         );
 #define BOXESCOUNT 5
-    Object boxObjects[BOXESCOUNT] = 
+    Box boxes[BOXESCOUNT] = 
     {
-        createCubeObject(boxPtr, {3,3,2}),
+        Box(boxPtr, {3,3,2}, Image(getProjectPath("assets/textures/toms.jpg"), 4)),
+        Box(boxPtr, {3,3,2}, Image(getProjectPath("assets/textures/basboos.jpg"), 4)),
+        Box(boxPtr, {3,3,2}, Image(getProjectPath("assets/textures/qalbi.jpg"), 4)),
+        Box(skyBoxPtr, {3,3,2}, Image(getProjectPath("assets/textures/skyBox.png"), 4, GL_NEAREST)),
+        Box(lightSourcePtr, {3, 3}),
 
-        createCubeObject(boxPtr, {3,3,2}),
-
-        createCubeObject(boxPtr, {3,3,2}),
-
-        createCubeObject(skyBoxPtr, {3,3,2}),
-        
-        createCubeObject(lightSourcePtr, {3}),
     };
+
 
 
     
-    float *boxesRotationFloats[BOXESCOUNT][3];
-    float *boxesPositionFloats[BOXESCOUNT][3];
-    float *boxesScalesFloats[BOXESCOUNT][3];
+
     std::string imguiBoxesHeaderNames[BOXESCOUNT];
 
-    Image boxesImages[BOXESCOUNT] = 
+    for(int i = 0; i < std::size(boxes); i++)
     {
-        Image(getProjectPath("assets/textures/toms.jpg"), 4),
-        Image(getProjectPath("assets/textures/basboos.jpg"), 4),
-        Image(getProjectPath("assets/textures/qalbi.jpg"), 4),
-        Image(getProjectPath("assets/textures/skyBox.png"), 4, GL_NEAREST),
-        Image(std::string(""), 0)
-    };
 
-    for(int i = 0; i < std::size(boxObjects); i++)
-    {
-        Object *box = &boxObjects[i];
-        
-        boxesPositionFloats[i][0] = &box->position.x;
-        boxesPositionFloats[i][1] = &box->position.y;
-        boxesPositionFloats[i][2] = &box->position.z;
 
-        boxesRotationFloats[i][0] = &box->rotation.x;
-        boxesRotationFloats[i][1] = &box->rotation.y;
-        boxesRotationFloats[i][2] = &box->rotation.z;
+        linkFloatAttributes(boxes[i].obj.mesh, boxes[i].attribsList);
 
-        boxesScalesFloats[i][0] = &box->scale.x;
-        boxesScalesFloats[i][1] = &box->scale.y;
-        boxesScalesFloats[i][2] = &box->scale.z;
+        //image
+        if(boxes[i].hasImage)
+        {
+            boxes[i].obj.setUniform("imgId", GL_TEXTURE0+i, true);
+            boxes[i].image.bind(GL_TEXTURE0 + i);
+        }
 
-        boxObjects[i].setUniform("imgId", 0, true);
-        boxObjects[i].mesh->getShader()->unUse();
 
-        if(i <= std::size(boxesImages))
-            boxesImages[i].bind(GL_TEXTURE0 + i);
-
-        boxObjects[i].changePos(vector3(0, i*2, 0));
+        boxes[i].obj.changePos(vector3(0, i*2, 0));
 
     }
+
     //View Setup
     glm::mat4 projection(1.0f);
     float fov = 45.0f;
@@ -306,16 +287,12 @@ std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectP
     glClearColor(0.1,0.1,0.1, 0);
 
 
-    for(int i = 0; i < std::size(boxObjects); i++)
+    for(int i = 0; i < std::size(boxes); i++)
         {
             const char *boxNamePrefix = "Box ";
             imguiBoxesHeaderNames[i] = std::string(boxNamePrefix) + std::to_string(i+1);
         }
 
-
-        *boxesScalesFloats[3][0] = 200;
-        *boxesScalesFloats[3][1] = 200;
-        *boxesScalesFloats[3][2] = 200;
     
     while (!glfwWindowShouldClose(mainWin)) 
     {
@@ -375,25 +352,28 @@ std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectP
             fpsCounterC_str = fpsCounter.c_str();
         }
 
-        for(int i = 0; i < std::size(boxObjects); i++)
+        for(int i = 0; i < std::size(boxes); i++)
         {
-            boxObjects[4].setUniform("aColor", glm::vec3(1), true);
-
+            Box *curBox = &boxes[i];
             //Rendering
             if(renderBox)
             {
-                boxesImages[i].bind(i);
-                glUseProgram(boxObjects[i].mesh->shaderId);
-                glBindVertexArray(boxObjects[i].mesh->vaoId);
-                boxObjects[i].setUniform("textureId", i);
-                boxObjects[i].render(mainCam.getMatrix(), projection);
+                boxes[i].image.bind(GL_TEXTURE0 + i);
+                glUseProgram(curBox->obj.mesh->shaderId);
+                glBindVertexArray(curBox->obj.mesh->vaoId);
+                curBox->obj.setUniform("hasImage", curBox->hasImage, true);
+                if(curBox->hasImage)
+                    curBox->obj.setUniform("textureId", GL_TEXTURE0+i);
+
+                curBox->obj.render(mainCam.getMatrix(), projection);
             }
             ImGui::PushID(i); 
             if (ImGui::CollapsingHeader(imguiBoxesHeaderNames[i].c_str()))
             {
-                ImGui::SliderFloat3("Position", *boxesPositionFloats[i], -5, 5);
-                ImGui::SliderFloat3("Rotation", *boxesRotationFloats[i], -360, 360);
-                ImGui::SliderFloat3("Scale", *boxesScalesFloats[i], 0.1, 4);
+                ImGui::SliderFloat3("Position", &curBox->obj.position.x, -5, 5);
+                ImGui::SliderFloat3("Rotation", &curBox->obj.rotation.x, -360, 360);
+                ImGui::SliderFloat3("Scale", &curBox->obj.scale.x, 0.1, 4);
+                ImGui::Checkbox("Render Image", &curBox->hasImage);
             } 
 
             ImGui::PopID();
@@ -539,6 +519,21 @@ void linkFloatAttributes(std::shared_ptr<Mesh> mesh , std::initializer_list<int>
     {
         mesh->linkAttribute(n, attribs.begin()[n], GL_FLOAT, overall * sizeof(float), (void*)(untillNow *sizeof(float)));
         untillNow += attribs.begin()[n];
+    }
+}
+
+void linkFloatAttributes(std::shared_ptr<Mesh> mesh , std::vector<int> attribs)
+{
+    size_t attribsSize = attribs.size();
+    int overall = 0;
+    for(int n = 0; n < attribsSize; n++)
+        overall += attribs[n];
+
+    int untillNow = 0;
+    for(int n = 0; n < attribsSize; n++)
+    {
+        mesh->linkAttribute(n, attribs[n], GL_FLOAT, overall * sizeof(float), (void*)(untillNow *sizeof(float)));
+        untillNow += attribs[n];
     }
 }
 
