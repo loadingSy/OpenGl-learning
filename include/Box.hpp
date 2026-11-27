@@ -1,3 +1,4 @@
+#pragma once
 #include "Image.hpp"
 #include "Object.hpp"
 #include <initializer_list>
@@ -16,6 +17,7 @@ class Box
 
     Image image;
     bool hasImage = false;
+    bool isLit = false;
 
     Box(Object &&pObj, std::initializer_list<int> pAttribs) : obj(std::move(pObj)), attribsList(pAttribs), image(Image("", 0)), hasImage(false), name("Box") {}
 
@@ -23,4 +25,6 @@ class Box
 
     Box(Object &&pObj, std::initializer_list<int> pAttribs, std::string_view pName) : obj(std::move(pObj)), attribsList(pAttribs), name(pName), image(Image("", 0)), hasImage(false) {}
 
+
+    void render(const glm::mat4 view, const glm::mat4 projection);
 };
