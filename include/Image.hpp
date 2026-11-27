@@ -25,6 +25,16 @@ class Image
         void bind(GLuint slot);
         void unBind();
 
+        Image(Image &&other) noexcept : id(other.id), imgBuffer(other.imgBuffer), imgPath(other.imgPath), width(other.width), height(other.height), colorChannels(other.colorChannels)
+        {
+            other.id = 0;
+            other.imgBuffer = nullptr;
+            other.imgPath = "";
+            other.height = 0;
+            other.width = 0;
+            other.colorChannels = 0;
+        }
+
         std::string imgPath;
         GLint width, height, colorChannels;
     private:
