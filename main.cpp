@@ -18,6 +18,7 @@
 #include "include/Camera.hpp"
 #include "include/EBO.hpp"
 #include "include/FilePaths.hpp"
+#include "include/FileReader.hpp"
 #include "include/Mesh.hpp"
 #include "include/Object.hpp"
 #include "include/Shader.hpp"
@@ -34,6 +35,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include "Object.hpp"
 #include "Box.hpp"
+#include "FileReader.hpp"
 #define DEBUG_UNIFORM_LOGS
 
 
@@ -139,14 +141,9 @@ int main()
         1.0f, -1.0f,  1.0f,  0.7f, 0.9f, 0.3f,  1.0f, 1.0f,
         -1.0f, -1.0f,  1.0f,  1.0f, 0.8f, 0.2f,  0.0f, 1.0f
     };
-    GLuint boxIndices[] = {
-        0,  1,  2,   0,  2,  3,
-        4,  5,  6,   4,  6,  7,
-        8,  9, 10,   8, 10, 11,
-        12, 13, 14,  12, 14, 15,
-        16, 17, 18,  16, 18, 19,
-        20, 21, 22,  20, 22, 23
-    };
+
+
+std::vector<GLuint> boxIndices = static_cast<std::vector<GLuint>>(readFileToVector<unsigned int>(getProjectPath("assets/data/boxIndices.txt"), ','));
 
 float skyBoxVertices[] = {
      1.0f,  1.0f, -1.0f,  1.0f, 1.0f, 1.0f,  0.50f, 0.6666666666f,
@@ -260,26 +257,34 @@ float boxWithNormal[] = {
     0.0f,  1.0f,  0.0f
 };
 
+std::vector<int> testVec = readFileToVector<int>(getProjectPath("assets/data/test.txt"), ',');
+
+std::cout << '\n';
+for(int i = 0; i < testVec.size(); i++)
+{
+    std::cout << testVec[i] << '\n';
+}
+
 std::shared_ptr<Mesh> boxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/unlit/defaultFragment.glsl")),
             VAO(),
             VBO(normalBoxVertices, sizeof(normalBoxVertices)),
-            EBO(boxIndices, sizeof(boxIndices))
+            EBO(boxIndices.data(), boxIndices.size()*sizeof(GLuint))
         );
 
 std::shared_ptr<Mesh> skyBoxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/unlit/defaultFragment.glsl")),
             VAO(),
             VBO(skyBoxVertices, sizeof(skyBoxVertices)),
-            EBO(boxIndices, sizeof(boxIndices))
+            EBO(boxIndices.data(), boxIndices.size()*sizeof(GLuint))
         );
 std::shared_ptr<Mesh> lightSourcePtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/unlit/defaultFragment.glsl")),
             VAO(),
             VBO(lightSourceBoxVertices, sizeof(lightSourceBoxVertices)),
-            EBO(boxIndices, sizeof(boxIndices))
+            EBO(boxIndices.data(), boxIndices.size()*sizeof(GLuint))
         );
 std::shared_ptr<Mesh> litBoxPtr = std::make_shared<Mesh>(Shader(getProjectPath("assets/Shaders/unlit/defaultVertex.glsl"),getProjectPath("assets/Shaders/lit/litFragment.glsl")),
             VAO(),
             VBO(normalBoxVertices, sizeof(normalBoxVertices)),
-            EBO(boxIndices, sizeof(boxIndices))
+            EBO(boxIndices.data(), boxIndices.size()*sizeof(GLuint))
         );
 
 #define BOXESCOUNT 6
