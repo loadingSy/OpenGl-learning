@@ -29,6 +29,7 @@ add_executable(ThisGame
     src/Vector.cpp
     src/Camera.cpp
     src/Object.cpp
+    src/Box.cpp
     
     imgui/imgui.cpp
     imgui/imgui_draw.cpp
